@@ -15,9 +15,9 @@ dotenv.config();
 
 connectDB();
 
-app.get("/", (req, res) => {
-  res.send("API is working successfully");
-});
+// app.get("/", (req, res) => {
+//   res.send("API is working successfully");
+// });
 
 app.use("/api/user", userRoutes);
 app.use("/api/chats", chatRoutes);

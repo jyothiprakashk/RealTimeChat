@@ -112,6 +112,33 @@ const SideDrawer = () => {
     }
   };
 
+  const getNotification = async () => {
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.get(
+        `/api/chats/getNotifications/${user._id}`,
+        config
+      );
+      console.log(data, "notification list data");
+      setNotification(data.notifications);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to load Chats",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+
   return (
     <Box
       display="flex"
@@ -135,21 +162,21 @@ const SideDrawer = () => {
       </Text>
       <div>
         <Menu>
-          <MenuButton p={1}>
+          <MenuButton p={1} onClick={getNotification}>
             <NotificationBadge
               count={notification.length}
               effect={Effect.SCALE}
             />
             <BellIcon fontSize="20px" m={1} />
           </MenuButton>
-          <MenuList>
+          <MenuList style={{ height: "300px", overflow: "scroll" }}>
             {!notification.length && "No New Messages"}
             {notification.map((notif) => (
               <MenuItem
                 key={notif._id}
                 onClick={() => {
                   setSelectedChat(notif.chat);
-                  setNotification(notification.filter((n) => n !== notif));
+                  // setNotification(notification.filter((n) => n !== notif));
                 }}
               >
                 {notif.chat.isGroupChat

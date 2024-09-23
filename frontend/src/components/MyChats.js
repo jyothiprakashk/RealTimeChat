@@ -8,10 +8,9 @@ import { getSender } from "../config/ChatLogic";
 import GroupModalChat from "./misclleneous/GroupModalChat";
 
 const MyChats = (props) => {
-  const { fetchAgain, setFetchAgain } = props;
+  const { fetchAgain } = props;
   const [loggedUser, setLoggedUser] = useState({});
-  const { user, setUser, selectedChat, setSelectedChat, chats, setChats } =
-    ChatState();
+  const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
   const toast = useToast();
   const fetchChats = async () => {
     try {

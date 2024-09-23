@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModal");
+const { ObjectId } = require("mongodb");
 
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
@@ -169,6 +170,52 @@ const removeFromGroup = asyncHandler(async (req, res) => {
   }
 });
 
+const addNotification = asyncHandler(async (req, res) => {
+  const { newNotification, userId } = req.body;
+
+  const result = await User.updateOne(
+    { _id: new ObjectId(userId) }, // Identify the user document
+    { $push: { notifications: newNotification } } // Push new notification to the array
+  );
+
+  const user = await User.findOne(
+    { _id: new ObjectId(userId) },
+    { notifications: 1, _id: 0 } // Retrieve only the notifications field
+  );
+
+  if (result) {
+    res.status(200).json({
+      success: true,
+      message: "Notification added successfully",
+      notifications: user.notifications, // Return all notifications
+    });
+  }
+});
+
+const getNotifications = asyncHandler(async (req, res) => {
+  const { userId } = req.params; // Assuming userId is passed as a URL parameter
+
+  try {
+    // Step 1: Retrieve all notifications for the user
+    const user = await User.findOne(
+      { _id: new ObjectId(userId) }
+      // { notifications: 1, _id: 0 } // Retrieve only the notifications array
+    );
+    // console.log(user, "notification---user");
+    // Step 2: Return all notifications in the response
+    if (user) {
+      res.status(200).json({
+        success: true,
+        notifications: user.notifications, // Return all notifications
+      });
+    } else {
+      res.status(404).json({ success: false, message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = {
   accessChat,
   fetchChats,
@@ -176,4 +223,6 @@ module.exports = {
   renameChatGroup,
   addToGroup,
   removeFromGroup,
+  addNotification,
+  getNotifications,
 };

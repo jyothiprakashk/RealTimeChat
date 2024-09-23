@@ -116,6 +116,33 @@ const SingleChat = (props) => {
     }
   };
 
+  const UpdateNotification = async (newMessageRecieved) => {
+    const configData = {
+      chat: newMessageRecieved.chat,
+      createdAt: newMessageRecieved.createdAt,
+    };
+
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.post(
+        "api/chats/updatenotification",
+        {
+          newNotification: configData,
+          userId: user._id,
+        },
+        config
+      );
+      setNotification(data.notifications);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
       if (
@@ -123,7 +150,9 @@ const SingleChat = (props) => {
         selectdChatCompare._id !== newMessageRecieved.chat._id
       ) {
         if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
+          const notificationList = [newMessageRecieved, ...notification];
+          setNotification(notificationList);
+          UpdateNotification(newMessageRecieved);
           setFetchAgain(!fetchAgain);
         }
       } else {
